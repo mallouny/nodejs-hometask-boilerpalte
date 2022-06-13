@@ -1,12 +1,14 @@
-const UserService = require('./userService');
+const { ApiError } = require("../middlewares/response.middleware");
+const { UserRepository } = require("../repositories/userRepository");
 
 class AuthService {
-    login(userData) {
-        const user = UserService.search(userData);
-        if(!user) {
-            throw Error('User not found');
+    login(req, res, next) {
+        const { email, password } = req.body;
+        const user = UserRepository.getOne({ email, password });
+        if (!user) {
+            return next(ApiError.badRequest("User not found"));
         }
-        return user;
+        return res.json(user);
     }
 }
 
